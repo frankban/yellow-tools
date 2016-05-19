@@ -14,7 +14,6 @@ elif [[ $1 == "staging" ]]; then
 elif [[ $1 == "guimaas" ]]; then
     domain="jujugui.org"
     prefix="www."
-    protocol="http"
 else
     exit
 fi
