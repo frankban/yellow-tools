@@ -16,9 +16,19 @@ case $1 in
     staging)
 	url='https://staging.jujucharms.com'
 	;;
-    *)
+    guimaas | jujugui.org)
 	url='https://www.jujugui.org'
+	;;
+    *)
+	url=http://$1
 	;;
 esac
 
-devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd --debug $2
+if [ "$#" -ge 2 ]; then
+    test=$2
+else
+    test=''
+fi
+
+#devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd --debug $test
+devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd $test

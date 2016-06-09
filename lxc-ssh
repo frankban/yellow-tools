@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Usage: lxc-ssh <lxc-name>
+# If more than one match, then the first found is used.
+
+ip=$(lxc list $1 --format json |jq '.[0].state.network.eth0.addresses[0].address' | tr -d '"')
+
+ssh -A $ip
