@@ -49,6 +49,21 @@ you can just use the `lxc` tools to start and stop it but you don't need to
 recreate it.  The home directory remains bound even if you start/stop the
 instance.
 
+[lxd-ssh](lxd-ssh)
+------------------------
+
+Creates a new lxd instance and binds your host home directory.
+
+Usage:
+
+`lxd-ssh <name>`
+
+for example:
+
+`lxd-ssh wily-test`
+
+If multiple instances match the searched name, the first will be used.  For instance if you have `trusty` and `trusty2`, then `lxd-ssh trusty` will connect to the `trusty` instance.
+
 [uitest-runner.sh](uitest-runner.sh)
 ------------------------------------
 
