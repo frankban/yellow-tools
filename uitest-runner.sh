@@ -30,5 +30,5 @@ else
     test=''
 fi
 
-#devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd --debug $test
-devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd $test
+devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd --debug $test
+#devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd $test
