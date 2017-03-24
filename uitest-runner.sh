@@ -30,12 +30,18 @@ else
     test=''
 fi
 
+if [ "$#" -ge 3 ]; then
+    args=$3
+else
+    args=''
+fi
+
 debug=''
 phantom=''
 #debug="--debug"
 #phantom="--driver phantom"
 
-cmd="devenv/bin/uitest  $url --credentials $credentials --admin $admin -c lxd $debug $phantom $test"
+cmd="devenv/bin/uitest $args $url --credentials $credentials --admin $admin -c lxd $debug $phantom $test"
 echo $cmd
 $cmd
 
