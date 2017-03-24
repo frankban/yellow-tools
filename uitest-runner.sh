@@ -11,16 +11,16 @@ set -eux
 
 case $1 in
     production)
-	url='https://jujucharms.com'
+	url='--url https://jujucharms.com'
 	;;
     staging)
-	url='https://staging.jujucharms.com'
+	url='--url https://staging.jujucharms.com'
 	;;
-    guimaas | jujugui.org)
-	url='https://www.jujugui.org'
+    qa | jujugui.org)
+	url=''
 	;;
     *)
-	url=http://$1
+	url='--url http://$1'
 	;;
 esac
 
@@ -30,5 +30,18 @@ else
     test=''
 fi
 
-devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd --debug $test
-#devenv/bin/uitest  --url $url --credentials $credentials --admin $admin -c lxd $test
+if [ "$#" -ge 3 ]; then
+    args=$3
+else
+    args=''
+fi
+
+debug=''
+phantom=''
+#debug="--debug"
+#phantom="--driver phantom"
+
+cmd="devenv/bin/uitest $args $url --credentials $credentials --admin $admin -c lxd $debug $phantom $test"
+echo $cmd
+$cmd
+
