@@ -35,4 +35,7 @@ phantom=''
 #debug="--debug"
 #phantom="--driver phantom"
 
-devenv/bin/uitest  $url --credentials $credentials --admin $admin -c lxd $debug $phantom $test
+cmd="devenv/bin/uitest  $url --credentials $credentials --admin $admin -c lxd $debug $phantom $test"
+echo $cmd
+$cmd
+
