@@ -14,7 +14,7 @@ set -e
 usage() {
     cmd=`basename $0`
     echo -e "Usage:\n  $cmd <image> <name>"
-    echo -e "For instance:\n  $cmd ubuntu-wily mycontainer"
+    echo -e "For instance:\n  $cmd ubuntu:wily mycontainer"
     exit 1
 }
 
