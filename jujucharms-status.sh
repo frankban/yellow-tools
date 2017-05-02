@@ -7,22 +7,25 @@
 set -eux
 protocol="https"
 prefix=""
+verify=""
 if [[ -z "$@" ]]; then
     domain="jujucharms.com"
 elif [[ $1 == "staging" ]]; then
     domain="staging.jujucharms.com"
-elif [[ $1 == "guimaas" ]]; then
+elif [[ $1 == "qa" ]]; then
+    protocol="https"
     domain="jujugui.org"
     prefix="www."
+    verify="--verify yes"
 else
     exit
 fi
-   
-http $protocol://$prefix$domain/_version
-http $protocol://api.$domain/identity/debug/info
-http $protocol://api.$domain/identity/debug/status
-http $protocol://api.$domain/jem/debug/info
-http $protocol://api.$domain/jem/debug/status
-http $protocol://demo.$domain/version
-http $protocol://api.$domain/charmstore/debug/info
-http $protocol://api.$domain/charmstore/v5/debug/status
+
+http $verify $protocol://$prefix$domain/_version
+http $verify $protocol://api.$domain/identity/debug/info
+http $verify $protocol://api.$domain/identity/debug/status
+http $verify $protocol://jimm.$domain/debug/info
+http $verify $protocol://jimm.$domain/debug/status
+#http $verify $protocol://demo.$domain/version
+http $verify $protocol://api.$domain/charmstore/debug/info
+http $verify $protocol://api.$domain/charmstore/v5/debug/status
