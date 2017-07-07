@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Create a privileged lxd container and bind mount current user's home
-# directory into it. This script assumes that the ubuntu user inside the
-# container and your current user have the same id: this is usually true in the
-# typical one-user development machine. This script automates what described at
+# directory into it. This script automates what described at
 # <https://tribaal.io/mounting-home-in-lxd.html>.
 
 # Save this script in your path, for instance as "lxc-launch-and-bind" and run
@@ -14,7 +12,7 @@ set -e
 usage() {
     cmd=`basename $0`
     echo -e "Usage:\n  $cmd <image> <name>"
-    echo -e "For instance:\n  $cmd ubuntu:wily mycontainer"
+    echo -e "For instance:\n  $cmd xenial mycontainer"
     exit 1
 }
 
@@ -24,7 +22,11 @@ image=$1
 name=$2
 
 user=$USER
-files="/etc/passwd /etc/shadow /etc/group /etc/gshadow"
+uid=`id -u`
+gid=`id -g`
+passfile="/etc/passwd"
+groupfile="/etc/group"
+files="$passfile $groupfile /etc/shadow /etc/gshadow"
 
 lxc launch $image $name -c security.privileged=true
 for file in `ls $files`; do
@@ -32,6 +34,10 @@ for file in `ls $files`; do
     lxc exec $name -- sh -c "until grep ubuntu $file > /dev/null; do sleep 0.1; done"
     lxc exec $name -- sed -i "s/ubuntu/$user/g" $file
 done
+echo "Configuring user and group ids ($uid:$gid)"
+lxc exec $name -- sed -i "s/:1000:1000/:$uid:$gid/g" $passfile
+lxc exec $name -- sed -i "s/:1000/:$gid/g" $groupfile
+
 echo "Setting password for user $user@$name"
 lxc exec $name -- passwd $user
 echo "Mounting $HOME inside the container"
