@@ -1,8 +1,30 @@
 #!/bin/bash
 
-# Usage: lxc-ssh <lxc-name>
-# If more than one match, then the first found is used.
+# Connect via SSH to a LXD, being it stopped or started.
 
-ip=$(lxc list $1 --format json |jq '.[0].state.network.eth0.addresses[0].address' | tr -d '"')
+set -e
 
-ssh -A $ip
+usage() {
+    cmd=`basename $0`
+    echo -e "Usage:\n  $cmd <name>"
+    echo -e "For instance:\n  $cmd mycontainer"
+    exit 1
+}
+
+[[ $# != 1 ]] && usage
+
+name=$1
+status=`lxc info $name | grep -i status | awk '{print tolower($2)}'`
+if [[ $status == "running" ]]; then
+    echo "$name is running"
+else
+    echo "starting $name"
+    lxc start $name
+    sleep 5
+fi
+echo "connecting to $name"
+
+address=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
+echo -e "ssh -A -t $address"
+
+ssh -A -t $address "cd $PWD && echo connected && exec /usr/bin/zsh"
