@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+import json
+import subprocess
+
+
+_STATUS_DOWN, _STATUS_LOST = 'down', 'lost'
+
+
+def main():
+    output = subprocess.check_output(['juju', 'status', '--format', 'json'])
+    status = json.loads(output.decode('utf-8'))
+    machine_services = {}
+    for machine in _machines(status):
+        services = machine_services.setdefault(machine, [])
+        services.append('jujud-machine-{}'.format(machine))
+    for unit, machine in _units(status):
+        services = machine_services.setdefault(machine, [])
+        services.append('jujud-unit-{}'.format(unit))
+    for machine, services in machine_services.items():
+        cmd = '; '.join('sudo systemctl restart '+s for s in services)
+        print("juju ssh {} '{}'".format(machine, cmd))
+        subprocess.check_output(['juju', 'ssh', machine, cmd])
+
+
+def _machines(status):
+    """Retrieve from status a list of machine agents that must be restarted."""
+    for name, data in status.get('machines', {}).items():
+        if _has_status(data, _STATUS_DOWN):
+            yield name
+
+
+def _units(status):
+    """Retrieve from status a list of unit agents that must be restarted."""
+    apps = status.get('applications', {})
+    for app in apps.values():
+        units = app.get('units', {})
+        for name, data in units.items():
+            if _has_status(data, _STATUS_LOST):
+                yield name.replace('/', '-'), data['machine']
+
+
+def _has_status(data, status):
+    """Report whether the status found in the provided data matches status."""
+    juju_status = data.get('juju-status', {})
+    return juju_status.get('current') == status
+
+
+if __name__ == '__main__':
+    main()
