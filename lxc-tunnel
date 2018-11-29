@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Create an SSH tunnel for accesing the service exposed by the container at the
 # given port.
@@ -10,19 +10,23 @@ set -e
 
 usage() {
     cmd=`basename $0`
-    echo -e "Usage:\n  $cmd <container> <port>"
-    echo -e "For instance:\n  $cmd mycontainer 4247"
+    echo "Usage:\n  $cmd <container> <port>"
+    echo "For instance:\n  $cmd mycontainer 4247"
     exit 1
 }
 
-[[ $# != 2 ]] && usage
+title() {
+    printf "\e[93m$*\e[0m\n"
+}
+
+[ "$#" != 2 ] && usage
 
 name=$1
 outport=$2
 inport=$(($RANDOM % 10000 + 5000))
 host=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
 
-echo access service at http://`hostname`.local:$inport/
+title access service at http://`hostname`.local:$inport/
 echo ssh -g -L $inport:$host:$outport $host
 ssh -g -L $inport:$host:$outport $host
 echo quitting tunnel

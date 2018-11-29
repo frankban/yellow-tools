@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Connect via SSH to a LXD, being it stopped or started.
 
@@ -6,16 +6,16 @@ set -e
 
 usage() {
     cmd=`basename $0`
-    echo -e "Usage:\n  $cmd <name>"
-    echo -e "For instance:\n  $cmd mycontainer"
+    echo "Usage:\n  $cmd <name>"
+    echo "For instance:\n  $cmd mycontainer"
     exit 1
 }
 
-[[ $# != 1 ]] && usage
+[ "$#" != 1 ] && usage
 
 name=$1
 status=`lxc info $name | grep -i status | awk '{print tolower($2)}'`
-if [[ $status == "running" ]]; then
+if [ "$status" = "running" ]; then
     echo "$name is running"
 else
     echo "starting $name"
@@ -25,6 +25,6 @@ fi
 echo "connecting to $name"
 
 address=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
-echo -e "ssh -A -t $address"
+echo "ssh -A -t $address"
 
-ssh -A -t $address "cd $PWD && echo connected && exec /usr/bin/zsh"
+ssh -A -t $address "cd $PWD && echo connected && exec $SHELL"

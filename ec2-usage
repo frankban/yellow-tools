@@ -2,7 +2,7 @@
 
 """List EC2 instances and volumes currently in use.
 
-To use this, you must "pip3 install boto" first.
+To use this, you must "pip install boto" first.
 """
 
 import argparse
@@ -35,7 +35,7 @@ Volume = namedtuple('Volume', 'id size state')
 
 def get_credentials():
     """Retrieve AWS credentials from ~/.ec2/aws_id."""
-    path = os.path.expanduser('~/.ec2/aws_id')
+    path = os.path.expanduser('~/dotfiles/ec2/aws_id')
     try:
         lines = [line.strip() for line in open(path)]
     except IOError:

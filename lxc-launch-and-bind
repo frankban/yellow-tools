@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Create a privileged lxd container and bind mount current user's home
 # directory into it. This script automates what described at
@@ -11,12 +11,12 @@ set -e
 
 usage() {
     cmd=`basename $0`
-    echo -e "Usage:\n  $cmd <image> <name>"
-    echo -e "For instance:\n  $cmd ubuntu-wily mycontainer"
+    echo "Usage:\n  $cmd <image> <name>"
+    echo "For instance:\n  $cmd ubuntu:bionic mycontainer"
     exit 1
 }
 
-[[ $# != 2 ]] && usage
+[ "$#" != 2 ] && usage
 
 image=$1
 name=$2
@@ -46,7 +46,8 @@ lxc config device add $name home disk source=$HOME path=/home/$user
 echo "Installing base packages"
 lxc exec $name -- apt update
 lxc exec $name -- apt upgrade -y
-lxc exec $name -- apt install -y build-essential git zsh
+shell=`basename $SHELL`
+lxc exec $name -- apt install -y build-essential git less nano $shell
 
 address=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
-echo -e "Use the following to connect:\nssh -A $address"
+echo "Use the following to connect:\nssh -A $address"
