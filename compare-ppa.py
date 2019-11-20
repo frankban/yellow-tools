@@ -14,7 +14,7 @@ import requests
 
 
 Package = namedtuple('Package', 'name path version arch sha')
-Diff = namedtuple('Diff', 'added removed changed')
+Diff = namedtuple('Diff', 'num_source num_target added removed changed')
 _DEFAULT_SUITES = [
     'precise',
     'trusty', 'trusty-infra-security', 'trusty-infra-updates',
@@ -98,6 +98,7 @@ def _extract(url, arches):
 
 def compare(packages1, packages2):
     """Compare two sets of package objects and produce a Diff."""
+    num_source, num_target = len(packages1), len(packages2)
     common = packages1 & packages2
     packages1 -= common
     packages2 -= common
@@ -110,9 +111,11 @@ def compare(packages1, packages2):
     for path in common:
         changed.append((dict1.pop(path), dict2.pop(path)))
     return Diff(
+        num_source=num_source,
+        num_target=num_target,
         added=tuple(sorted(dict2.values())),
         removed=tuple(sorted(dict1.values())),
-        changed=tuple(sorted(changed),)
+        changed=tuple(sorted(changed)),
     )
 
 
@@ -136,6 +139,7 @@ def report(diff):
             print(f'    {package1.sha}')
             print(f'  + {package2.name} {package2.version} ({package2.arch})')
             print(f'    {package2.sha}')
+    print(f'source: {diff.num_source} | target: {diff.num_target}')
 
 
 def _ppa_url(value):
