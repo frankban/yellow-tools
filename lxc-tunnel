@@ -23,7 +23,7 @@ title() {
 
 name=$1
 outport=$2
-inport=$(($RANDOM % 10000 + 5000))
+inport=`shuf -i 5000-9999 -n 1`
 host=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
 
 title access service at http://`hostname`.local:$inport/

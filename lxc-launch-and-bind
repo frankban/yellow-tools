@@ -50,4 +50,4 @@ shell=`basename $SHELL`
 lxc exec $name -- apt install -y build-essential git less nano $shell
 
 address=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
-echo "Use the following to connect:\nssh -A $address"
+echo "Use the following to connect:\nssh -A $address\nlxc-ssh $name"

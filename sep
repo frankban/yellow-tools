@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cols=`tput cols`
+chars=$(($cols * 3))
+printf '=%.0s' `seq 1 $chars`

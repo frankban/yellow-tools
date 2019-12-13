@@ -22,9 +22,18 @@ else
     lxc start $name
     sleep 5
 fi
-echo "connecting to $name"
 
-address=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
+echo "waiting for ip address"
+address=
+while [ -z "$address" ]; do
+    address=`lxc info $name | grep eth0 | grep -v inet6 | head -1 | awk '{print $3}'`
+    sleep 0.2
+done
+
+echo "waiting for ability to connect"
+while ! ssh -A -t $address true > /dev/null 2>&1; do
+    sleep 0.1
+done
+
 echo "ssh -A -t $address"
-
 ssh -A -t $address "cd $PWD && echo connected && exec $SHELL"
