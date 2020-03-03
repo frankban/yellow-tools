@@ -6,7 +6,7 @@ from datetime import date, timedelta
 TEAM = (
     # Week 0.
     'Casey',
-    'Mark',
+    'Francesco',
     'Allan',
     'JC',
     'Martin',
