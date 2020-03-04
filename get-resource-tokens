@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+
+"""Retrieve resource tokens for a given contract and machine."""
+
+# This script requires Python3 and the contract CLI to be installed.
+
+import argparse
+import functools
+import json
+import logging
+import subprocess
+
+
+def call(*args):
+    cmd = args + ('--format', 'json')
+    logging.debug('executing: {}'.format(' '.join(cmd)))
+    out = subprocess.check_output(cmd)
+    logging.debug('output: {}'.format(out))
+    return json.loads(out)
+
+
+def setup():
+    """Set up logging and argument parser."""
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('contract_id', help='The id of the contract')
+    parser.add_argument('machine_id', help='The id of the machine, excluding the "contract-cli-test-machine-" prefix')
+    parser.add_argument('--prod', action='store_true', help='Work on production')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
+    args = parser.parse_args()
+    logging.basicConfig(
+        datefmt='%Y-%m-%d %H:%M:%S',
+        format='%(asctime)s %(levelname)s:\t%(message)s',
+        level=logging.DEBUG if args.verbose else logging.INFO)
+    args.url = 'https://contracts.canonical.com' if args.prod else 'https://contracts.staging.canonical.com'
+    args.contract = functools.partial(call, 'contract', '--url', args.url)
+    return args
+
+
+def run(args):
+    """Run the command."""
+    machine_id = 'contract-cli-test-machine-' + args.machine_id
+
+    logging.info('retrieving contract info')
+    info = args.contract('status', args.contract_id)
+    contract_name, account_id, account_name = info['name'], info['account-id'], info['account-name']
+    resources = [res['name'] for res in info['resources']]
+
+    logging.info('retrieving contract token')
+    contract_token = args.contract('get-contract-token', args.contract_id)['contractToken']
+
+    logging.info('retrieving machine series')
+    series = args.contract('status', machine_id)['series']
+    logging.info('series is {}'.format(series))
+
+    logging.info('retrieving machine token')
+    machine_token = args.contract('add-machine', args.contract_id, args.machine_id, '--series', series)['machineToken']
+    logging.info('machine token is {}'.format(machine_token))
+
+    logging.info('retrieving resource tokens')
+    tokens = {
+        res: args.contract('get-resource-token', machine_id, machine_token, res)['resourceToken']
+        for res in resources
+    }
+
+    print('\nserver:   {}'.format(args.url))
+    print('account:  {} ({})'.format(account_name, account_id))
+    print('contract: {}'.format(contract_name))
+    print('ua attach {}\n'.format(contract_token))
+    print('\n\n'.join('{}:\n{}'.format(res, token) for res, token in tokens.items()))
+
+
+if __name__ == '__main__':
+    args = setup()
+    run(args)
