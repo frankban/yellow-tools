@@ -38,8 +38,6 @@ def setup():
 
 def run(args):
     """Run the command."""
-    machine_id = 'contract-cli-test-machine-' + args.machine_id
-
     logging.info('retrieving contract info')
     info = args.contract('status', args.contract_id)
     contract_name, account_id, account_name = info['name'], info['account-id'], info['account-name']
@@ -48,17 +46,10 @@ def run(args):
     logging.info('retrieving contract token')
     contract_token = args.contract('get-contract-token', args.contract_id)['contractToken']
 
-    logging.info('retrieving machine series')
-    series = args.contract('status', machine_id)['series']
-    logging.info('series is {}'.format(series))
-
-    logging.info('retrieving machine token')
-    machine_token = args.contract('add-machine', args.contract_id, args.machine_id, '--series', series)['machineToken']
-    logging.info('machine token is {}'.format(machine_token))
-
     logging.info('retrieving resource tokens')
+    machine_id = 'contract-cli-test-machine-' + args.machine_id
     tokens = {
-        res: args.contract('get-resource-token', machine_id, machine_token, res)['resourceToken']
+        res: args.contract('get-resource-token', args.contract_id, machine_id, res)['resourceToken']
         for res in resources
     }
 
