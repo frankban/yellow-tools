@@ -11,7 +11,7 @@ TEAM = (
     'JC',
     'Martin',
     # Week 1.
-    'Francesco',
+    'Brian',
     'Ales',
     'Fabrice',
     'Domas',
