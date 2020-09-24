@@ -55,11 +55,12 @@ def get_account_contracts(ids):
             id=id,
             encoded_id=contract_info["id"],
             effective_to=effective_to,
-            products=", ".join(contract_info['products']),
+            products=", ".join(sorted(contract_info['products'])),
             account_id=account_info["id"],
             account_name=account_info["name"],
         )
-        account_contracts.setdefault(contract.account_id, []).append(contract)
+        key = (contract.account_id, contract.products)
+        account_contracts.setdefault(key, []).append(contract)
     return account_contracts
 
 
