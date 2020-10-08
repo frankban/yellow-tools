@@ -22,6 +22,7 @@ CONTRACT_RELATED_TABLES = (
     "contract_obligations",
     "contract_external_asset_ids",
     "contract_machines",
+    "contract_items",
     "resource_access",
 )
 
