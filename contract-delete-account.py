@@ -26,6 +26,8 @@ def get_delete_queries(id, delete_users):
     queries = [
         f"DELETE FROM subscriptions_external_subscription_ids WHERE subscription IN (SELECT id FROM subscriptions WHERE account_id = '{id}');",
         f"DELETE FROM purchase_items WHERE purchase_id IN (SELECT id FROM purchases WHERE account_id = '{id}');",
+        f"DELETE FROM contract_products WHERE contract_id IN (SELECT id FROM contracts WHERE account_id = '{id}');",
+        f"DELETE FROM contract_items WHERE contract_id IN (SELECT id FROM contracts WHERE account_id = '{id}');",
     ]
     if delete_users:
         queries.append(f"DELETE FROM users WHERE id IN (SELECT user_id FROM account_access WHERE account_id = '{id}');")
